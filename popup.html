@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .address-option{
+            cursor: pointer;
+        }
+        #hit-container{
+            min-width: 20em;
+        }
+        input {
+            margin-bottom: 1em;
+        }
+        .trip-description{
+            padding: 0 1em 0 1em;
+        }
+        .total-duration{
+            font-size: large;
+        }
+    </style>
+</head>
+<body>
+<div id="form">
+    <input type="text" placeholder="From address" id="from-address-field">
+    <button id="lookup-button">Find</button>
+    <input type="text" placeholder="Home address" id="home-address-field">
+    <button id="set-home-button">Set</button>
+</div>
+<div id="hit-container">
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
