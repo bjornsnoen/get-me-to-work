@@ -4,7 +4,12 @@ let setHomeButton = document.querySelector('#set-home-button');
 let lookupAddressField = document.querySelector('#from-address-field');
 let hitContainer = document.querySelector('#hit-container');
 
-chrome.runtime.onMessage.addListener((message, sender) => {
+chrome.runtime.onMessage.addListener((message) => {
+    /**
+     * @var message
+     * @var message.pulseOptions
+     * @var message.pulseOptions.contentLocation
+     */
     if (message.action === 'finnParsed'){
         if (!homeAddressField.dataset.address){
             // No point in going on with this
@@ -26,6 +31,10 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 });
 
 chrome.storage.sync.get('homeAddress', (data) => {
+    /**
+     * @var address
+     * @var address.adressetekst
+     */
     let address = JSON.parse(data.homeAddress || '{}');
     homeAddressField.setAttribute('value', address.adressetekst || '');
     homeAddressField.dataset.address = data.homeAddress;
@@ -34,8 +43,7 @@ chrome.storage.sync.get('homeAddress', (data) => {
 chrome.tabs.executeScript(null, {
     file: "finnParser.js"
 }, () => {
-    let err = chrome.runtime.lastError;
-    if (err){
+    if (chrome.runtime.lastError){
         // Eh, prolly new tab or smth, the important part was touching the error anyway
     }
 });
@@ -103,6 +111,12 @@ const setHome = (address) => {
     homeAddressField.dataset.address = JSON.stringify(address);
 };
 
+/**
+ * @param address
+ * @param address.poststed
+ * @param itemClickCallback
+ * @returns {HTMLElement}
+ */
 const addressToHitNode = (address, itemClickCallback) => {
     let newNode = document.createElement('div');
     newNode.classList.add('address-option');
@@ -117,7 +131,7 @@ const getNextMondayMorningFormatted = () => {
     while (date.getDay() !== 1){
         date.setDate(date.getDate() + 1);
     }
-    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, 0)}-${date.getDate().toString().padStart(2, 0)}T07:00:00+0${Math.abs(date.getTimezoneOffset()/60)}00`
+    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}T07:00:00+0${Math.abs(date.getTimezoneOffset()/60)}00`
 };
 
 const findRouteBetweenTwoAddresses = (a, b) => {
@@ -139,8 +153,16 @@ const findRouteBetweenTwoAddresses = (a, b) => {
         .then(data => data.data)
         .then( data => {
             hitContainer.innerHTML="";
+            /**
+             * @var data
+             * @var data.trip.tripPatterns
+             * @namespace data.trip
+             */
             if (data.trip && data.trip.tripPatterns){
                 data.trip.tripPatterns.forEach(trip => {
+                    /**
+                     * @var trip.legs
+                     */
                     let tripHtmlNode = document.createElement("div");
 
                     const lengthInMinutes = trip.duration / 60;
@@ -171,6 +193,9 @@ lookupButton.onclick = () => {
     startSpinner();
     lookupAddress(lookupAddressField.value, function (data) {
         hitContainer.innerHTML = "";
+        /**
+         * @var data.adresser
+         */
         if (data.adresser && data.adresser.length > 1){
             data.adresser.forEach(function(address) {
                 let newNode = addressToHitNode(address, (evt) => {
