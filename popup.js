@@ -18,6 +18,7 @@ const getGraphqlQuery = (addressA, addressB) => `{
       	longitude:${addressA.representasjonspunkt.lon}
       }
     }
+    dateTime: "${getNextMondayMorningFormatted()}"
     to: {
       coordinates:{
         latitude: ${addressB.representasjonspunkt.lat}
@@ -69,6 +70,14 @@ const addressToHitNode = (address, itemClickCallback) => {
     newNode.innerHTML = address.adressetekst + ', ' + address.poststed;
     newNode.dataset.address = JSON.stringify(address);
     return newNode;
+};
+
+const getNextMondayMorningFormatted = () => {
+    let date = new Date;
+    while (date.getDay() !== 1){
+        date.setDate(date.getDate() + 1);
+    }
+    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, 0)}-${date.getDate().toString().padStart(2, 0)}T07:00:00+0${Math.abs(date.getTimezoneOffset()/60)}00`
 };
 
 const findRouteBetweenTwoAddresses = (a, b) => {
