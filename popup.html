@@ -17,6 +17,17 @@
         .total-duration{
             font-size: large;
         }
+        #spinner-icon{
+            width: 6em;
+            height: 6em;
+        }
+        #spinner-container{
+            display: flex;
+            justify-content: center;
+        }
+        .hidden{
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -27,6 +38,9 @@
     <button id="set-home-button">Set</button>
 </div>
 <div id="hit-container">
+</div>
+<div id="spinner-container" class="hidden">
+    <img src="images/spinner.gif" alt="spinning loader icon" id="spinner-icon"/>
 </div>
 
 <script src="popup.js"></script>

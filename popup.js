@@ -11,6 +11,7 @@ chrome.runtime.onMessage.addListener((message, sender) => {
             return;
         }
 
+        startSpinner();
         let parsedFromFinnAddress = {
             representasjonspunkt: {
                 lat: message.pulseOptions.contentLocation.latitude,
@@ -38,6 +39,16 @@ chrome.tabs.executeScript(null, {
         // Eh, prolly new tab or smth, the important part was touching the error anyway
     }
 });
+
+const startSpinner = () => {
+    let spinnerContainer = document.querySelector('#spinner-container');
+    spinnerContainer.classList.remove('hidden');
+};
+
+const stopSpinner = () => {
+    let spinnerContainer = document.querySelector('#spinner-container');
+    spinnerContainer.classList.add('hidden');
+};
 
 const getGraphqlQuery = (addressA, addressB) => `{
   trip(
@@ -110,6 +121,7 @@ const getNextMondayMorningFormatted = () => {
 };
 
 const findRouteBetweenTwoAddresses = (a, b) => {
+    startSpinner();
     const qry = getGraphqlQuery(a, b);
     const service = "https://api.entur.io/journey-planner/v2/graphql";
     const options = {
@@ -152,10 +164,11 @@ const findRouteBetweenTwoAddresses = (a, b) => {
             } else {
                 hitContainer.innerHTML = "No trips!";
             }
-        });
+        }).finally(() => stopSpinner());
 };
 
 lookupButton.onclick = () => {
+    startSpinner();
     lookupAddress(lookupAddressField.value, function (data) {
         hitContainer.innerHTML = "";
         if (data.adresser && data.adresser.length > 1){
@@ -163,6 +176,8 @@ lookupButton.onclick = () => {
                 let newNode = addressToHitNode(address, (evt) => {
                     let addressFrom = JSON.parse(evt.target.dataset.address);
                     let addressTo = JSON.parse(homeAddressField.dataset.address);
+                    lookupAddressField.value = evt.target.innerText;
+                    hitContainer.innerHTML = "";
                     findRouteBetweenTwoAddresses(addressFrom, addressTo);
                 });
                 hitContainer.append(newNode);
@@ -174,10 +189,12 @@ lookupButton.onclick = () => {
         } else {
             hitContainer.innerHTML = "Ingen treff!";
         }
+        stopSpinner();
     });
 };
 
 setHomeButton.onclick = () => {
+    startSpinner();
     lookupAddress(homeAddressField.value, function (data) {
         hitContainer.innerHTML = "";
         data.adresser.forEach(function (item) {
@@ -187,5 +204,6 @@ setHomeButton.onclick = () => {
             });
             hitContainer.append(newNode);
         });
+        stopSpinner();
     });
 };
