@@ -17,7 +17,6 @@ chrome.runtime.onMessage.addListener((message, sender) => {
                 lon: message.pulseOptions.contentLocation.longitude
             }
         };
-        debugger;
         lookupAddressField.value = message.foundAddress;
 
         let addressTo = JSON.parse(homeAddressField.dataset.address);
