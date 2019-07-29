@@ -4,10 +4,40 @@ let setHomeButton = document.querySelector('#set-home-button');
 let lookupAddressField = document.querySelector('#from-address-field');
 let hitContainer = document.querySelector('#hit-container');
 
+chrome.runtime.onMessage.addListener((message, sender) => {
+    if (message.action === 'finnParsed'){
+        if (!homeAddressField.dataset.address){
+            // No point in going on with this
+            return;
+        }
+
+        let parsedFromFinnAddress = {
+            representasjonspunkt: {
+                lat: message.pulseOptions.contentLocation.latitude,
+                lon: message.pulseOptions.contentLocation.longitude
+            }
+        };
+        debugger;
+        lookupAddressField.value = message.foundAddress;
+
+        let addressTo = JSON.parse(homeAddressField.dataset.address);
+        findRouteBetweenTwoAddresses(parsedFromFinnAddress, addressTo);
+    }
+});
+
 chrome.storage.sync.get('homeAddress', (data) => {
     let address = JSON.parse(data.homeAddress || '{}');
     homeAddressField.setAttribute('value', address.adressetekst || '');
     homeAddressField.dataset.address = data.homeAddress;
+});
+
+chrome.tabs.executeScript(null, {
+    file: "finnParser.js"
+}, () => {
+    let err = chrome.runtime.lastError;
+    if (err){
+        // Eh, prolly new tab or smth, the important part was touching the error anyway
+    }
 });
 
 const getGraphqlQuery = (addressA, addressB) => `{
@@ -97,8 +127,6 @@ const findRouteBetweenTwoAddresses = (a, b) => {
         .then(data => data.json())
         .then(data => data.data)
         .then( data => {
-            debugger;
-            console.log(data);
             hitContainer.innerHTML="";
             if (data.trip && data.trip.tripPatterns){
                 data.trip.tripPatterns.forEach(trip => {
@@ -125,7 +153,6 @@ const findRouteBetweenTwoAddresses = (a, b) => {
             } else {
                 hitContainer.innerHTML = "No trips!";
             }
-            console.log(data);
         });
 };
 

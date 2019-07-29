@@ -1,7 +1,7 @@
 {
-  "name": "Get Me Home Norway",
+  "name": "Get Me To Work Norway",
   "version": "1.0",
-  "description": "Get a trip plan in Norway",
+  "description": "Get a trip to work time estimate",
   "background": {
     "scripts": ["background.js"],
     "persistent": false
